@@ -30,8 +30,7 @@ bool board_is_empty(const Board *b, int x, int y);
 bool board_place(Board *b, int x, int y, TetrominoType type, int rotation, char mark);
 void board_remove(Board *b, int x, int y, TetrominoType type, int rotation);
 
-/* 文本可视化：精确输出 height 行、每行 width 个字符；空格子用 '.'，占用格子输出其 mark；每行以 '
-' 结尾。 */
+/* 文本可视化：精确输出 height 行、每行 width 个字符；空格子用 '.'，占用格子输出其 mark；每行以 '\n' 结尾。 */
 void board_print(const Board *b, FILE *out);
 
 /* 清空棋盘内容，保留尺寸，所有格子复位为 '.' */

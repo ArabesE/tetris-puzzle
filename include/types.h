@@ -7,8 +7,10 @@
 
 #define PROJECT_NAME "tetromino_solver"
 
+#define PLACEMENT_SIZE sizeof(Placement)
+
 /* 通用返回码：用于区分正常、输入问题、资源问题与无解等情况。
- * 决定：这些枚举值同时作为程序的进程退出码使用；main 必须原样返回。 */
+ * 这些枚举值同时作为程序的进程退出码使用；main 必须原样返回。 */
 typedef enum StatusCode
 {
     STATUS_OK = 0,
@@ -45,7 +47,7 @@ typedef struct Placement
     int rotation;       /* 旋转编号，从 0 开始，范围由具体形状决定 */
     int x;              /* 在棋盘上的锚点位置（见 tetromino.h 坐标/锚点约定） */
     int y;
-    char mark; /* 输出字符标记，如 'A'..'Z'（按 solver 约定分配） */
+    char mark; /* 仅用于输出与区分具体“块”的字符标记，如 'A'..'Z' */
 } Placement;
 
 /* 供选择的积木袋：记录每种形状的数量及总数 */
