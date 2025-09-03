@@ -7,6 +7,9 @@
 
 #define PROJECT_NAME "tetromino_solver"
 
+#define INT_SIZE sizeof(int)
+#define SIZE_T_SIZE sizeof(size_t)
+#define CELL_SIZE sizeof(Cell)
 #define PLACEMENT_SIZE sizeof(Placement)
 
 /* 通用返回码：用于区分正常、输入问题、资源问题与无解等情况。
