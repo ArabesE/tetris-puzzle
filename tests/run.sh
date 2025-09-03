@@ -23,11 +23,11 @@ for f in tests/cases/*.in; do
   echo "Exit code: $status"
 
   expected=0
-  case "$f" in
-    *solvable_*)   expected=0 ;;
-    *unsolvable_*) expected=3 ;;
-    *malformed_*)  expected=1 ;;
-    *stress_*)     expected=0 ;;
+  case "$(basename "$f")" in
+    unsolvable_*) expected=3 ;;
+    malformed_*)  expected=1 ;;
+    stress_*)     expected=0 ;;
+    solvable_*)   expected=0 ;;
   esac
 
   if [ "$status" -eq "$expected" ]; then
