@@ -33,6 +33,6 @@ size_t tetro_rotation_count(TetrominoType type);
 /* 获取指定形状在指定旋转下的 4 个相对格子坐标。
  * 要求：out_cells 长度至少为 4；返回实际写入的格子数（固定为 4）。
  * 坐标系/锚点/旋转定义严格遵循本文件顶部的“统一约定”。 */
-size_t tetro_get_cells(TetrominoType type, int rotation, Cell out_cells[4]);
+size_t tetro_get_cells(TetrominoType type, size_t rotation, Cell out_cells[4]);
 
 #endif /* TETROMINO_H */

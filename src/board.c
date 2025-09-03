@@ -17,7 +17,7 @@ struct Board
     char state[];
 };
 
-static inline size_t state_idx(int W, int x, int y)
+static inline int state_idx(int W, int x, int y)
 {
     return y * W + x;
 }
@@ -28,7 +28,7 @@ Board *board_create(int width, int height)
         return NULL;
 
     // memory allocation
-    size_t state_size = width * height;
+    size_t state_size = (size_t)(width * height);
     Board *b = malloc(2 * INT_SIZE + state_size);
     if (!b)
         return NULL;
@@ -61,20 +61,20 @@ int board_height(const Board *b)
     return b->H;
 }
 
-int board_cell_count(const Board *b)
+size_t board_cell_count(const Board *b)
 {
     if (!b)
-        return -1;
-    return b->W * b->H;
+        return 0;
+    return (size_t)(b->W * b->H);
 }
 
-int board_filled_count(const Board *b)
+size_t board_filled_count(const Board *b)
 {
     if (!b)
-        return -1;
+        return 0;
     int W = b->W;
     int H = b->H;
-    int count = 0;
+    size_t count = 0;
     for (int y = 0; y < H; ++y)
     {
         for (int x = 0; x < W; ++x)
@@ -100,7 +100,7 @@ bool board_is_empty(const Board *b, int x, int y)
     return b->state[state_idx(b->W, x, y)] == EMPTY_MARK;
 }
 
-bool board_place(Board *b, int x, int y, TetrominoType type, int rotation, char mark)
+bool board_place(Board *b, int x, int y, TetrominoType type, size_t rotation, char mark)
 {
     if (!b)
         return false;
@@ -131,7 +131,7 @@ bool board_place(Board *b, int x, int y, TetrominoType type, int rotation, char 
     return true;
 }
 
-void board_remove(Board *b, int x, int y, TetrominoType type, int rotation)
+void board_remove(Board *b, int x, int y, TetrominoType type, size_t rotation)
 {
     if (!b)
         return;

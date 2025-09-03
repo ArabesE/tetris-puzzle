@@ -26,6 +26,8 @@ const char *tetro_type_name(TetrominoType type)
         return "J";
     case TETRO_L:
         return "L";
+    case TETRO_TYPE_COUNT:
+        return "";
     default:
         return "";
     }
@@ -70,13 +72,15 @@ size_t tetro_rotation_count(TetrominoType type)
     case TETRO_J:
     case TETRO_L:
         return 4;
+    case TETRO_TYPE_COUNT:
+        return 0;
     default:
         return 0;
     }
 }
 
 // assume rotation is valid for type
-size_t tetro_get_cells(TetrominoType type, int rotation, Cell out_cells[4])
+size_t tetro_get_cells(TetrominoType type, size_t rotation, Cell out_cells[4])
 {
     switch (type)
     {
@@ -243,6 +247,8 @@ size_t tetro_get_cells(TetrominoType type, int rotation, Cell out_cells[4])
             return 0;
         }
         break;
+    case TETRO_TYPE_COUNT:
+        return 0;
     default:
         return 0;
     }

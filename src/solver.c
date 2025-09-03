@@ -56,7 +56,7 @@ static inline bool stack_is_empty(SolverStack *stack)
 // stack full or not
 static inline bool stack_is_full(SolverStack *stack)
 {
-    return stack->top == stack->capacity - 1;
+    return stack->top == (int)stack->capacity - 1;
 }
 
 // push a new frame to stack
@@ -116,7 +116,7 @@ static inline size_t generate_candidates(int x, int y, char mark, size_t *counts
 // frame has remaining candidates or not
 static inline bool has_candidate(SolverFrame *frame)
 {
-    return frame->idx + 1 < frame->cands_size;
+    return frame->idx + 1 < (int)frame->cands_size;
 }
 
 // find next empty cell on board
@@ -158,8 +158,8 @@ StatusCode solver_solve(Board *board,
     size_t bag_total = bag->total;
     size_t counts[TETRO_TYPE_COUNT];
     memcpy(counts, bag->counts, TETRO_TYPE_COUNT * SIZE_T_SIZE);
-    int target_cells = bag_total * 4;
-    if (target_cells != board_cell_count(board))
+    size_t target_cells = bag_total * 4;
+    if (target_cells != (size_t)board_cell_count(board))
     {
         // piece and board cell numbers do not match, unsolvable
         *inout_count = 0;
@@ -184,7 +184,7 @@ StatusCode solver_solve(Board *board,
             for (size_t i = 0; i < bag_total; ++i)
             {
                 SolverFrame *frame = stack->frames + i;
-                size_t cand_idx = frame->idx;
+                size_t cand_idx = (size_t)(frame->idx);
                 memcpy(out_list + i, frame->cands + cand_idx, PLACEMENT_SIZE);
             }
             destroy_stack(stack);

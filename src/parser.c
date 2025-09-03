@@ -80,7 +80,7 @@ StatusCode parse_from_stream(FILE *in, int *out_w, int *out_h, TetrominoBag *out
 
             // map letter to type (case-insensitive)
             char tok[2];
-            tok[0] = toupper(ch);
+            tok[0] = (char)toupper(ch);
             tok[1] = '\0';
             TetrominoType t = tetro_type_from_token(tok);
             if (t == TETRO_TYPE_COUNT)

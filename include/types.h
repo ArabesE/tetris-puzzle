@@ -47,7 +47,7 @@ typedef enum TetrominoType
 typedef struct Placement
 {
     TetrominoType type; /* 形状类型 */
-    int rotation;       /* 旋转编号，从 0 开始，范围由具体形状决定 */
+    size_t rotation;    /* 旋转编号，从 0 开始，范围由具体形状决定 */
     int x;              /* 在棋盘上的锚点位置（见 tetromino.h 坐标/锚点约定） */
     int y;
     char mark; /* 仅用于输出与区分具体“块”的字符标记，如 'A'..'Z' */

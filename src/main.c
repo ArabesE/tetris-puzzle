@@ -71,7 +71,10 @@ int main(int argc, char **argv)
         fprintf(stderr, "Error: invalid argument while solving\n");
         break;
     case STATUS_ERR_MEMORY:
-        fprintf(stderr, "Error: memory issues while solving\n");
+        fprintf(stderr, "Error: memory error while solving\n");
+        break;
+    case STATUS_ERR_INPUT:
+        fprintf(stderr, "Error: input error while solving\n");
         break;
     default:
         fprintf(stderr, "Error: unknown error while solving\n");
