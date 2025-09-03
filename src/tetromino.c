@@ -33,7 +33,7 @@ const char *tetro_type_name(TetrominoType type)
 
 TetrominoType tetro_type_from_token(const char *token)
 {
-    if (token == NULL || token[0] == '\0' || !isalpha((unsigned char)token[0]) || token[1] != '\0')
+    if (!token || token[0] == '\0' || !isalpha((unsigned char)token[0]) || token[1] != '\0')
         return TETRO_TYPE_COUNT;
     switch (toupper((unsigned char)token[0]))
     {

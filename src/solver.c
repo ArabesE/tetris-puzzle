@@ -42,7 +42,7 @@ static inline SolverStack *create_stack(size_t max_frame_num)
 // destroy stack
 static inline void destroy_stack(SolverStack *stack)
 {
-    if (stack == NULL)
+    if (!stack)
         return;
     free(stack);
 }
@@ -60,26 +60,26 @@ static inline bool stack_is_full(SolverStack *stack)
 }
 
 // push a new frame to stack
-static inline int push_frame(size_t cands_size, Placement *cands, SolverStack *stack)
+static inline StatusCode push_frame(size_t cands_size, Placement *cands, SolverStack *stack)
 {
-    if (cands == NULL)
-        return -1;
+    if (!cands)
+        return STATUS_ERR_MEMORY;
 
     if (stack_is_full(stack))
-        return -1;
+        return STATUS_ERR_MEMORY;
 
     stack->top++;
     SolverFrame *frame = stack->frames + stack->top;
     frame->cands_size = cands_size;
     frame->idx = -1;
     memcpy(frame->cands, cands, cands_size * PLACEMENT_SIZE);
-    return 0;
+    return STATUS_OK;
 }
 
 // pop a frame from stack, return top frame after popping
 static inline SolverFrame *pop_frame(SolverStack *stack)
 {
-    if (stack == NULL)
+    if (!stack)
         return NULL;
 
     stack->top--;
@@ -152,7 +152,7 @@ StatusCode solver_solve(Board *board,
                         Placement *out_list,
                         size_t *inout_count)
 {
-    if (board == NULL || bag == NULL || out_list == NULL || inout_count == NULL)
+    if (!board || !bag || !out_list || !inout_count)
         return STATUS_ERR_INVALID_ARGUMENT;
 
     size_t bag_total = bag->total;
@@ -168,7 +168,7 @@ StatusCode solver_solve(Board *board,
 
     // create stack
     SolverStack *stack = create_stack(bag_total);
-    if (stack == NULL)
+    if (!stack)
         return STATUS_ERR_MEMORY;
 
     // iterative backtracking
@@ -200,11 +200,11 @@ StatusCode solver_solve(Board *board,
             size_t cands_size = generate_candidates(pos.x, pos.y, mark, counts, cands);
             if (cands_size == 0)
                 continue;
-            int res = push_frame(cands_size, cands, stack);
-            if (res != 0)
+            StatusCode res = push_frame(cands_size, cands, stack);
+            if (res != STATUS_OK)
             {
                 destroy_stack(stack);
-                return STATUS_ERR_MEMORY;
+                return res;
             }
             need_new_frame = false;
         }

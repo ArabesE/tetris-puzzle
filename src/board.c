@@ -42,35 +42,35 @@ Board *board_create(int width, int height)
 
 void board_destroy(Board *b)
 {
-    if (b == NULL)
+    if (!b)
         return;
     free(b);
 }
 
 int board_width(const Board *b)
 {
-    if (b == NULL)
+    if (!b)
         return -1;
     return b->W;
 }
 
 int board_height(const Board *b)
 {
-    if (b == NULL)
+    if (!b)
         return -1;
     return b->H;
 }
 
 int board_cell_count(const Board *b)
 {
-    if (b == NULL)
+    if (!b)
         return -1;
     return b->W * b->H;
 }
 
 int board_filled_count(const Board *b)
 {
-    if (b == NULL)
+    if (!b)
         return -1;
     int W = b->W;
     int H = b->H;
@@ -88,21 +88,21 @@ int board_filled_count(const Board *b)
 
 bool board_in_bounds(const Board *b, int x, int y)
 {
-    if (b == NULL)
+    if (!b)
         return false;
     return x >= 0 && x < b->W && y >= 0 && y < b->H;
 }
 
 bool board_is_empty(const Board *b, int x, int y)
 {
-    if (b == NULL)
+    if (!b)
         return false;
     return b->state[state_idx(b->W, x, y)] == EMPTY_MARK;
 }
 
 bool board_place(Board *b, int x, int y, TetrominoType type, int rotation, char mark)
 {
-    if (b == NULL)
+    if (!b)
         return false;
 
     // get 4 cells
@@ -133,7 +133,7 @@ bool board_place(Board *b, int x, int y, TetrominoType type, int rotation, char 
 
 void board_remove(Board *b, int x, int y, TetrominoType type, int rotation)
 {
-    if (b == NULL)
+    if (!b)
         return;
 
     // get 4 cells
@@ -153,7 +153,7 @@ void board_remove(Board *b, int x, int y, TetrominoType type, int rotation)
 
 void board_print(const Board *b, FILE *out)
 {
-    if (b == NULL || out == NULL)
+    if (!b || !out)
         return;
 
     int W = b->W;
@@ -168,7 +168,7 @@ void board_print(const Board *b, FILE *out)
 
 void board_clear(Board *b)
 {
-    if (b == NULL)
+    if (!b)
         return;
 
     // clear state
