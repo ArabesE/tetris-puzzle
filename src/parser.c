@@ -94,9 +94,9 @@ StatusCode parse_from_stream(FILE *in, int *out_w, int *out_h, TetrominoBag *out
                 ++p;
                 // parse unsigned decimal > 0, manual to avoid extra headers
                 size_t val = 0;
-                if (!isdigit(*p))
+                if (!isdigit((unsigned char)*p))
                     return STATUS_ERR_INPUT;
-                while (isdigit(*p))
+                while (isdigit((unsigned char)*p))
                 {
                     size_t digit = (size_t)(*p - '0');
                     // overflow check: val = val*10 + digit

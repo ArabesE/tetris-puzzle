@@ -8,6 +8,7 @@
  *   - 放置/移除给定形状；
  *   - 统计与打印。 */
 
+#define BOARD_SIZE sizeof(Board)
 #define EMPTY_MARK '.'
 
 struct Board
@@ -28,8 +29,10 @@ Board *board_create(int width, int height)
         return NULL;
 
     // memory allocation
-    size_t state_size = (size_t)(width * height);
-    Board *b = malloc(2 * INT_SIZE + state_size);
+    size_t state_size = (size_t)width * (size_t)height;
+    if (state_size > SIZE_MAX - BOARD_SIZE)
+        return NULL;
+    Board *b = malloc(BOARD_SIZE + state_size);
     if (!b)
         return NULL;
 
@@ -65,7 +68,7 @@ size_t board_cell_count(const Board *b)
 {
     if (!b)
         return 0;
-    return (size_t)(b->W * b->H);
+    return (size_t)b->W * (size_t)b->H;
 }
 
 size_t board_filled_count(const Board *b)
@@ -96,6 +99,8 @@ bool board_in_bounds(const Board *b, int x, int y)
 bool board_is_empty(const Board *b, int x, int y)
 {
     if (!b)
+        return false;
+    if (!board_in_bounds(b, x, y))
         return false;
     return b->state[state_idx(b->W, x, y)] == EMPTY_MARK;
 }

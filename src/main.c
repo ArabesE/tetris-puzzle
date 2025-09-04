@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
@@ -54,8 +55,15 @@ int main(int argc, char **argv)
         return STATUS_ERR_MEMORY;
     }
     size_t inout_count = bag.total;
-    Placement list[inout_count];
-    memset(list, 0, inout_count * PLACEMENT_SIZE);
+    size_t alloc_count = inout_count > 0 ? inout_count : 1;
+    Placement *list = (Placement *)malloc(alloc_count * PLACEMENT_SIZE);
+    if (!list)
+    {
+        fprintf(stderr, "Error: failed allocating placements\n");
+        board_destroy(board);
+        return STATUS_ERR_MEMORY;
+    }
+    memset(list, 0, alloc_count * PLACEMENT_SIZE);
 
     // solve
     res = solver_solve(board, &bag, list, &inout_count);
@@ -82,6 +90,7 @@ int main(int argc, char **argv)
     }
 
     // exit
+    free(list);
     board_destroy(board);
     return res;
 }

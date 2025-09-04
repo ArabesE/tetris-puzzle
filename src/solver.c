@@ -9,7 +9,7 @@
  *   - 无法覆盖时返回无解状态。 */
 
 #define SOLVER_FRAME_SIZE sizeof(SolverFrame)
-#define SOLVER_STACK_SIZE (SIZE_T_SIZE + INT_SIZE)
+#define SOLVER_STACK_SIZE sizeof(SolverStack)
 #define MARK_NUM 26
 
 // a frame in the solver stack
@@ -31,7 +31,8 @@ typedef struct SolverStack
 // create stack
 static inline SolverStack *create_stack(size_t max_frame_num)
 {
-    SolverStack *stack = calloc(SOLVER_STACK_SIZE + max_frame_num * SOLVER_FRAME_SIZE, 1);
+    size_t bytes = SOLVER_STACK_SIZE + max_frame_num * SOLVER_FRAME_SIZE;
+    SolverStack *stack = calloc(1, bytes);
     if (!stack)
         return NULL;
     stack->capacity = max_frame_num;
@@ -157,7 +158,7 @@ StatusCode solver_solve(Board *board,
 
     size_t bag_total = bag->total;
     size_t counts[TETRO_TYPE_COUNT];
-    memcpy(counts, bag->counts, TETRO_TYPE_COUNT * SIZE_T_SIZE);
+    memcpy(counts, bag->counts, sizeof(counts));
     size_t target_cells = bag_total * 4;
     if (target_cells != (size_t)board_cell_count(board))
     {
