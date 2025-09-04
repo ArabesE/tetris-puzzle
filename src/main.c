@@ -39,7 +39,8 @@ int main(int argc, char **argv)
     int w, h;
     TetrominoBag bag;
     StatusCode res = parse_from_stream(input, &w, &h, &bag);
-    fclose(input);
+    if (argc > 1 && input && input != stdin)
+        fclose(input);
     if (res != STATUS_OK)
     {
         fprintf(stderr, "Error: failed parsing '%s'\n", argc > 1 ? argv[1] : "stdin");

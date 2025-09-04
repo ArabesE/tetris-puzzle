@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include "board.h"
 
 /* 在此文件中实现棋盘的内部数据结构与全部接口：
@@ -18,9 +19,10 @@ struct Board
     char state[];
 };
 
-static inline int state_idx(int W, int x, int y)
+static inline size_t state_idx(int W, int x, int y)
 {
-    return y * W + x;
+    // W,x,y are validated by callers; compute in size_t to avoid signed overflow UB
+    return (size_t)y * (size_t)W + (size_t)x;
 }
 
 Board *board_create(int width, int height)

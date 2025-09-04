@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include "solver.h"
 #include "tetromino.h"
 
@@ -31,6 +32,9 @@ typedef struct SolverStack
 // create stack
 static inline SolverStack *create_stack(size_t max_frame_num)
 {
+    // guard against overflow in allocation size
+    if (max_frame_num > 0 && max_frame_num > (SIZE_MAX - SOLVER_STACK_SIZE) / SOLVER_FRAME_SIZE)
+        return NULL;
     size_t bytes = SOLVER_STACK_SIZE + max_frame_num * SOLVER_FRAME_SIZE;
     SolverStack *stack = calloc(1, bytes);
     if (!stack)
@@ -82,12 +86,12 @@ static inline SolverFrame *pop_frame(SolverStack *stack)
 {
     if (!stack)
         return NULL;
-
+    if (stack->top == -1)
+        return NULL; // already empty
     stack->top--;
     if (stack->top == -1)
-        return NULL;
-
-    return stack->frames + stack->top;
+        return NULL; // no previous frame
+    return stack->frames + stack->top; // new top (previous frame)
 }
 
 // generate candidate placements at cell
@@ -101,13 +105,16 @@ static inline size_t generate_candidates(int x, int y, char mark, size_t *counts
             size_t rotation_count = tetro_rotation_count(type);
             for (size_t rot = 0; rot < rotation_count; ++rot)
             {
-                Placement *cand = out_cands + idx;
-                cand->type = type;
-                cand->rotation = rot;
-                cand->x = x;
-                cand->y = y;
-                cand->mark = mark;
-                idx++;
+                if (idx < CANDS_MAX_SIZE)
+                {
+                    Placement *cand = out_cands + idx;
+                    cand->type = type;
+                    cand->rotation = rot;
+                    cand->x = x;
+                    cand->y = y;
+                    cand->mark = mark;
+                    idx++;
+                }
             }
         }
     }
@@ -159,13 +166,22 @@ StatusCode solver_solve(Board *board,
     size_t bag_total = bag->total;
     size_t counts[TETRO_TYPE_COUNT];
     memcpy(counts, bag->counts, sizeof(counts));
+    // overflow guard for computing target cells
+    if (bag_total > SIZE_MAX / 4)
+        return STATUS_ERR_INVALID_ARGUMENT;
+    // index guard for internal stack indexing (top is int)
+    if (bag_total > (size_t)INT_MAX)
+        return STATUS_ERR_INVALID_ARGUMENT;
+    size_t board_cells = board_cell_count(board);
     size_t target_cells = bag_total * 4;
-    if (target_cells != (size_t)board_cell_count(board))
+    if (target_cells != board_cells)
     {
         // piece and board cell numbers do not match, unsolvable
         *inout_count = 0;
         return STATUS_ERR_UNSOLVABLE;
     }
+    // compute initial filled cells once
+    size_t filled_cells = board_filled_count(board);
 
     // create stack
     SolverStack *stack = create_stack(bag_total);
@@ -177,7 +193,7 @@ StatusCode solver_solve(Board *board,
     while (true)
     {
         // 1) terminate, solved
-        if (board_filled_count(board) == target_cells)
+    if (filled_cells == target_cells)
         {
             // solved
             *inout_count = bag_total;
@@ -200,7 +216,28 @@ StatusCode solver_solve(Board *board,
             Placement cands[CANDS_MAX_SIZE];
             size_t cands_size = generate_candidates(pos.x, pos.y, mark, counts, cands);
             if (cands_size == 0)
-                continue;
+            {
+                // No candidates here, need to backtrack immediately
+                if (!stack_is_empty(stack))
+                {
+                    SolverFrame *prev_frame = pop_frame(stack);
+                    if (prev_frame != NULL)
+                    {
+                        Placement *prev_placement = prev_frame->cands + prev_frame->idx;
+                        board_remove(board, prev_placement->x, prev_placement->y, prev_placement->type, prev_placement->rotation);
+                        counts[prev_placement->type]++;
+                        if (filled_cells >= 4)
+                            filled_cells -= 4;
+                        need_new_frame = false;
+                        continue;
+                    }
+                }
+                // nothing to backtrack
+                *inout_count = 0;
+                board_clear(board);
+                destroy_stack(stack);
+                return STATUS_ERR_UNSOLVABLE;
+            }
             StatusCode res = push_frame(cands_size, cands, stack);
             if (res != STATUS_OK)
             {
@@ -219,6 +256,7 @@ StatusCode solver_solve(Board *board,
             if (board_place(board, cand->x, cand->y, cand->type, cand->rotation, cand->mark))
             {
                 counts[cand->type]--;
+                filled_cells += 4;
                 need_new_frame = true;
             }
             continue;
@@ -231,6 +269,8 @@ StatusCode solver_solve(Board *board,
             Placement *prev_placement = prev_frame->cands + prev_frame->idx;
             board_remove(board, prev_placement->x, prev_placement->y, prev_placement->type, prev_placement->rotation);
             counts[prev_placement->type]++;
+            if (filled_cells >= 4)
+                filled_cells -= 4;
             need_new_frame = false;
             continue;
         }
