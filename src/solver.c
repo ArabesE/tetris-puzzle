@@ -64,6 +64,25 @@ static inline bool stack_is_full(SolverStack *stack)
     return stack->top == (int)stack->capacity - 1;
 }
 
+// undo the placement represented by the current top frame (if any)
+static inline bool undo_top_placement(Board *board,
+                                      SolverStack *stack,
+                                      size_t counts[TETRO_TYPE_COUNT],
+                                      size_t *filled_cells)
+{
+    if (stack_is_empty(stack))
+        return false;
+    SolverFrame *frame = stack->frames + stack->top;
+    if (frame->idx < 0)
+        return false; // nothing placed at this frame yet
+    Placement *prev_placement = frame->cands + frame->idx;
+    board_remove(board, prev_placement->x, prev_placement->y, prev_placement->type, prev_placement->rotation);
+    counts[prev_placement->type]++;
+    if (*filled_cells >= 4)
+        *filled_cells -= 4;
+    return true;
+}
+
 // push a new frame to stack
 static inline StatusCode push_frame(size_t cands_size, Placement *cands, SolverStack *stack)
 {
@@ -90,7 +109,7 @@ static inline SolverFrame *pop_frame(SolverStack *stack)
         return NULL; // already empty
     stack->top--;
     if (stack->top == -1)
-        return NULL; // no previous frame
+        return NULL;                   // no previous frame
     return stack->frames + stack->top; // new top (previous frame)
 }
 
@@ -193,7 +212,7 @@ StatusCode solver_solve(Board *board,
     while (true)
     {
         // 1) terminate, solved
-    if (filled_cells == target_cells)
+        if (filled_cells == target_cells)
         {
             // solved
             *inout_count = bag_total;
@@ -217,26 +236,17 @@ StatusCode solver_solve(Board *board,
             size_t cands_size = generate_candidates(pos.x, pos.y, mark, counts, cands);
             if (cands_size == 0)
             {
-                // No candidates here, need to backtrack immediately
-                if (!stack_is_empty(stack))
+                // No candidates for next cell: undo the placement at current top frame
+                if (!undo_top_placement(board, stack, counts, &filled_cells))
                 {
-                    SolverFrame *prev_frame = pop_frame(stack);
-                    if (prev_frame != NULL)
-                    {
-                        Placement *prev_placement = prev_frame->cands + prev_frame->idx;
-                        board_remove(board, prev_placement->x, prev_placement->y, prev_placement->type, prev_placement->rotation);
-                        counts[prev_placement->type]++;
-                        if (filled_cells >= 4)
-                            filled_cells -= 4;
-                        need_new_frame = false;
-                        continue;
-                    }
+                    // nothing to undo => unsolvable
+                    *inout_count = 0;
+                    board_clear(board);
+                    destroy_stack(stack);
+                    return STATUS_ERR_UNSOLVABLE;
                 }
-                // nothing to backtrack
-                *inout_count = 0;
-                board_clear(board);
-                destroy_stack(stack);
-                return STATUS_ERR_UNSOLVABLE;
+                need_new_frame = false;
+                continue;
             }
             StatusCode res = push_frame(cands_size, cands, stack);
             if (res != STATUS_OK)
@@ -266,11 +276,14 @@ StatusCode solver_solve(Board *board,
         SolverFrame *prev_frame = pop_frame(stack);
         if (prev_frame != NULL)
         {
-            Placement *prev_placement = prev_frame->cands + prev_frame->idx;
-            board_remove(board, prev_placement->x, prev_placement->y, prev_placement->type, prev_placement->rotation);
-            counts[prev_placement->type]++;
-            if (filled_cells >= 4)
-                filled_cells -= 4;
+            // child frame removed; undo placement at new top (the parent)
+            if (!undo_top_placement(board, stack, counts, &filled_cells))
+            {
+                *inout_count = 0;
+                board_clear(board);
+                destroy_stack(stack);
+                return STATUS_ERR_UNSOLVABLE;
+            }
             need_new_frame = false;
             continue;
         }
