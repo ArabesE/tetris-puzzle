@@ -5,35 +5,36 @@
 #include "types.h"
 #include "tetromino.h"
 
-/* 棋盘为不透明类型，内部表示对外隐藏。坐标系与锚点约定与 tetromino.h 保持一致：
- * 原点在左上角，x→右，y→下；放置位置 (x,y) 表示将该形状在当前旋转下的锚点对齐到棋盘的 (x,y)。 */
+/* The board is an opaque type; its internal representation is hidden.
+ * Coordinates/anchor follow tetromino.h: origin (0,0) at top-left; x→right, y→down.
+ * Placing at (x,y) aligns the shape's anchor at the current rotation to board (x,y). */
 
 typedef struct Board Board;
 
-/* 创建与销毁（width,height 必须 > 0） */
+/* Create and destroy (width,height must be > 0). */
 Board *board_create(int width, int height);
 void board_destroy(Board *b);
 
-/* 基础属性查询 */
+/* Basic properties */
 int board_width(const Board *b);
 int board_height(const Board *b);
 size_t board_cell_count(const Board *b);   /* width * height */
-size_t board_filled_count(const Board *b); /* 当前已占用格子数 */
+size_t board_filled_count(const Board *b); /* currently filled cell count */
 
-/* 边界与占用检查 */
+/* Bounds and occupancy checks */
 bool board_in_bounds(const Board *b, int x, int y);
 bool board_is_empty(const Board *b, int x, int y);
 
-/* 放置与移除：
- * - board_place：若 4 个目标格均在界内且为空，则以给定 mark 填入并返回 true；否则不修改并返回 false。
- * - board_remove：前置条件——必须与先前一次成功放置的 (x,y,type,rotation,mark) 完全一致；否则行为未定义。 */
+/* Placement/removal:
+ * - board_place: if the 4 target cells are in bounds and empty, fill them with mark and return true; otherwise return false and do not modify.
+ * - board_remove: precondition—must match a prior successful placement (x,y,type,rotation,mark) exactly; otherwise behavior is undefined. */
 bool board_place(Board *b, int x, int y, TetrominoType type, size_t rotation, char mark);
 void board_remove(Board *b, int x, int y, TetrominoType type, size_t rotation);
 
-/* 文本可视化：精确输出 height 行、每行 width 个字符；空格子用 '.'，占用格子输出其 mark；每行以 '\n' 结尾。 */
+/* Text visualization: print exactly height lines of width chars; '.' for empty, piece mark for filled; each line ends with '\n'. */
 void board_print(const Board *b, FILE *out);
 
-/* 清空棋盘内容，保留尺寸，所有格子复位为 '.' */
+/* Clear the board content, keep dimensions, reset all cells to '.'. */
 void board_clear(Board *b);
 
 #endif /* BOARD_H */

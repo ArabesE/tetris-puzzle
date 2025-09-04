@@ -4,10 +4,10 @@
 #include "solver.h"
 #include "tetromino.h"
 
-/* 在此文件中实现求解逻辑：
- *   - 按需要组织尝试顺序与中间状态；
- *   - 在找到第一组完整覆盖后通过 out_list 返回；
- *   - 无法覆盖时返回无解状态。 */
+/* Solver implementation:
+ *   - Organize try order and intermediate state for backtracking.
+ *   - Return the first full tiling via out_list.
+ *   - Return UNSOLVABLE when coverage cannot be achieved. */
 
 #define SOLVER_FRAME_SIZE sizeof(SolverFrame)
 #define SOLVER_STACK_SIZE sizeof(SolverStack)

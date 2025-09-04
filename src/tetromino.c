@@ -2,11 +2,11 @@
 #include <string.h>
 #include "tetromino.h"
 
-/* 在此文件中实现 tetromino.h 中声明的所有与形状相关的函数。
- * 需要：
- *   - 为 7 种形状提供名称与解析逻辑；
- *   - 定义各形状在不同旋转下的 4 个相对坐标；
- *   - 保证返回的坐标系在整个项目内自洽。 */
+/* Implement functions declared in tetromino.h for tetromino utilities.
+ * Includes:
+ *   - Name and token parsing for 7 shapes.
+ *   - Relative coordinates for each rotation.
+ *   - Consistency of coordinates across the project. */
 
 const char *tetro_type_name(TetrominoType type)
 {

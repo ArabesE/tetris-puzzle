@@ -82,4 +82,4 @@ See `tests/cases/*` for solvable, unsolvable, malformed, and stress examples. Ru
 
 ## License
 
-MIT
+MIT License — see `LICENSE` for full text. © 2025 Loren Bian.

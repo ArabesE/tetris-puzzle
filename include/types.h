@@ -12,8 +12,8 @@
 #define CELL_SIZE sizeof(Cell)
 #define PLACEMENT_SIZE sizeof(Placement)
 
-/* 通用返回码：用于区分正常、输入问题、资源问题与无解等情况。
- * 这些枚举值同时作为程序的进程退出码使用；main 必须原样返回。 */
+/* General status codes used across the program.
+ * These values are also used as the process exit codes; main should return them verbatim. */
 typedef enum StatusCode
 {
     STATUS_OK = 0,
@@ -23,14 +23,14 @@ typedef enum StatusCode
     STATUS_ERR_INVALID_ARGUMENT = 4
 } StatusCode;
 
-/* 平面上的一个格子偏移（或绝对坐标） */
+/* A single grid cell offset (or absolute board coordinate). */
 typedef struct Cell
 {
     int x;
     int y;
 } Cell;
 
-/* 7 种标准 tetromino 形状类型 */
+/* The 7 standard tetromino types. */
 typedef enum TetrominoType
 {
     TETRO_I = 0,
@@ -43,21 +43,21 @@ typedef enum TetrominoType
     TETRO_TYPE_COUNT
 } TetrominoType;
 
-/* 待放置/已放置的一块积木的信息 */
+/* A placement (to be tried or already placed) on the board. */
 typedef struct Placement
 {
-    TetrominoType type; /* 形状类型 */
-    size_t rotation;    /* 旋转编号，从 0 开始，范围由具体形状决定 */
-    int x;              /* 在棋盘上的锚点位置（见 tetromino.h 坐标/锚点约定） */
+    TetrominoType type; /* tetromino type */
+    size_t rotation;    /* rotation index starting at 0; valid range depends on the shape */
+    int x;              /* anchor position on the board (see coordinate/anchor contract in tetromino.h) */
     int y;
-    char mark; /* 仅用于输出与区分具体“块”的字符标记，如 'A'..'Z' */
+    char mark; /* output mark used to distinguish pieces, e.g., 'A'..'Z' */
 } Placement;
 
-/* 供选择的积木袋：记录每种形状的数量及总数 */
+/* Bag of available tetrominoes: counts per type and total. */
 typedef struct TetrominoBag
 {
     size_t counts[TETRO_TYPE_COUNT];
-    size_t total; /* 所有积木总数 */
+    size_t total; /* total number of pieces across all types */
 } TetrominoBag;
 
 #endif /* TYPES_H */

@@ -3,11 +3,11 @@
 #include <limits.h>
 #include "board.h"
 
-/* 在此文件中实现棋盘的内部数据结构与全部接口：
- *   - 构造/析构与尺寸查询；
- *   - 边界/占用判断；
- *   - 放置/移除给定形状；
- *   - 统计与打印。 */
+/* Board implementation:
+ *   - Construction/destruction and size queries.
+ *   - Bounds/occupancy checks.
+ *   - Place/remove a given shape.
+ *   - Stats and printing. */
 
 #define BOARD_SIZE sizeof(Board)
 #define EMPTY_MARK '.'
