@@ -5,12 +5,13 @@ SRC_DIR := src
 INC_DIR := include
 BUILD   := build
 BIN     := bin
+STRIP   := strip
 
 # 编译选项
 CSTD    := -std=c11
 WARN    := -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -Wswitch-enum
 CDEBUG  := -O0 -g3
-CREL    := -O2
+CREL    := -O2 -DNDEBUG
 CPPFLAGS:= -I$(INC_DIR)
 LDFLAGS :=
 
@@ -42,12 +43,17 @@ SRCS := $(wildcard $(SRC_DIR)/*.c)
 OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD)/%.o,$(SRCS))
 DEPS := $(OBJS:.o=.d)
 
-.PHONY: all debug release clean run test dirs
+.PHONY: all debug release release-strip clean run test dirs
 
 all: dirs $(BIN)/$(PROJECT)
 
 release:
 	$(MAKE) MODE=release all
+
+# Build release and strip symbols for smallest binary
+release-strip:
+	$(MAKE) MODE=release all
+	$(STRIP) $(BIN)/$(PROJECT)
 
 debug:
 	$(MAKE) MODE=debug all

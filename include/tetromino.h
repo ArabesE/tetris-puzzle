@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-#define CANDS_MAX_SIZE 19
+#define CANDS_MAX_SIZE 19 // (O=1; I/S/Z=2 each; T/J/L=4 each)
 
 /* 坐标与旋转的统一约定：
  * - 棋盘坐标系：原点 (0,0) 在左上角；x 向右递增，y 向下递增。

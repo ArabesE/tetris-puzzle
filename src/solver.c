@@ -11,7 +11,7 @@
 
 #define SOLVER_FRAME_SIZE sizeof(SolverFrame)
 #define SOLVER_STACK_SIZE sizeof(SolverStack)
-#define MARK_NUM 26
+#define MARK_NUM 26 // 26 letters from A-Z
 
 // a frame in the solver stack
 typedef struct SolverFrame
