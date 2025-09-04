@@ -220,10 +220,7 @@ StatusCode solver_solve(Board *board,
                 counts[cand->type]--;
                 need_new_frame = true;
             }
-            else
-            {
-                continue;
-            }
+            continue;
         }
 
         // 4) current frame exhausted, backtrack

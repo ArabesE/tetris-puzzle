@@ -41,7 +41,7 @@ int main(int argc, char **argv)
     fclose(input);
     if (res != STATUS_OK)
     {
-        fprintf(stderr, "Error: failed parsing '%s'\n", argv[1]);
+        fprintf(stderr, "Error: failed parsing '%s'\n", argc > 1 ? argv[1] : "stdin");
         parser_print_usage(stderr);
         return res;
     }

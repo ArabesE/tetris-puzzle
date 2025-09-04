@@ -17,6 +17,7 @@ for f in tests/cases/*.in; do
 " "$f"
   echo "Input:"
   sed 's/^/  /' "$f"
+  echo
   echo "Output:"
   "$BIN" < "$f"
   status=$?
